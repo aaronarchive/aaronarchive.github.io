@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Experiment | Aaron Archive</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="page-body">
+    <header class="site-header page-header" aria-label="Primary navigation">
+      <a class="home-link" href="../index.html" aria-label="Home" title="Home">⌂</a>
+      <a class="brand" href="../index.html">Aaron Archive</a>
+      <nav class="nav-links" aria-label="Site sections">
+        <a href="experience.html">Experience</a>
+        <a href="experiment.html">Experiment</a>
+        <a href="expectation.html">Expectation</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+    </header>
+
+    <main class="page-main">
+      <section class="page-hero">
+        <p class="section-kicker">Things I am doing</p>
+        <h1>Experiment</h1>
+        <p>
+          A home for current practice, new skills, small attempts, awkward
+          progress, and the honest middle of learning.
+        </p>
+      </section>
+
+      <section class="outdoor-gallery experiment-gallery" aria-label="Experiment gallery">
+        <button
+          class="gallery-card experiment-gallery-card video-card"
+          id="golf"
+          type="button"
+          data-title="Range practice"
+          data-label="Golf"
+          data-image="../assets/golf-range-practice.jpg"
+          data-alt="Aaron practicing golf at a driving range."
+          data-video-only="true"
+          data-video-poster="../assets/golf-range-practice.jpg"
+          data-video-src="../assets/golf-range-practice.mov"
+          data-video-title="Golf range practice"
+          data-note="Stance is not perfect yet, but that is kind of the point right now. I am enjoying the progress, the small adjustments, and the feeling of slowly learning how a swing should feel."
+        >
+          <img
+            src="../assets/golf-range-practice.jpg"
+            alt="Aaron practicing golf at a driving range."
+          />
+          <i class="video-card-play" aria-hidden="true"></i>
+          <strong>Golf range practice</strong>
+        </button>
+
+        <button
+          class="gallery-card experiment-gallery-card"
+          id="tennis"
+          type="button"
+          data-title="Finding rhythm, eventually"
+          data-label="Tennis"
+          data-image="../assets/tennis-practice-friend.jpg"
+          data-alt="Aaron playing tennis with a friend on an outdoor court."
+          data-note="A lot of missed shots, a lot of walking back to collect the ball, and somehow still showing up for the next rally. Every now and then, one lucky shot lands just right and the Federer-Nadal spirit gets briefly invoked."
+        >
+          <img
+            src="../assets/tennis-practice-friend.jpg"
+            alt="Aaron playing tennis with a friend on an outdoor court."
+          />
+          <strong>Tennis with a friend</strong>
+        </button>
+
+        <button
+          class="gallery-card experiment-gallery-card"
+          id="snowboarding"
+          type="button"
+          data-title="Grouse Mountain practice"
+          data-label="Snowboarding"
+          data-image="../assets/grouse-snowboarding-sunset.jpg"
+          data-alt="Sunset and city view from Grouse Mountain while snowboarding."
+          data-gallery="../assets/grouse-snowboarding-sunset.jpg|../assets/grouse-snowboarding-city-view.jpg|../assets/grouse-snowboarding-wind-turbine.jpg|../assets/grouse-snowboarding-chair.jpg|../assets/grouse-snowboarding-fog-portrait.jpg|../assets/grouse-snowboarding-friend-sunset.jpg|../assets/grouse-snowboarding-night-slope.jpg"
+          data-gallery-alts="Sunset and city view from Grouse Mountain while snowboarding.|City lights and sunset from Grouse Mountain.|Snowy run below the wind turbine at Grouse Mountain.|Aaron sitting on a snowy chairlift at Grouse Mountain.|Aaron resting on a foggy snowy slope at Grouse Mountain.|Aaron snowboarding with a friend near sunset.|Night skiing and snowboarding lights on a snowy slope."
+          data-video-poster="../assets/grouse-sunset-view-video-poster.jpg"
+          data-video-src="../assets/grouse-sunset-view.mov"
+          data-video-title="Sunset view from Grouse"
+          data-video-note="A quiet look across the snow as the sky fades into orange. This is the kind of view that makes the cold worth it."
+          data-note="Balance, turns, confidence, and trying to look slightly less like I am negotiating with gravity. Not mastered yet, but definitely part of the experiment. The city view from Grouse Mountain is beautiful, and the sunset alone is worth staying for."
+        >
+          <img
+            src="../assets/grouse-snowboarding-sunset.jpg"
+            alt="Sunset and city view from Grouse Mountain while snowboarding."
+          />
+          <strong>Snowboarding at Grouse</strong>
+        </button>
+      </section>
+
+      <dialog class="outdoor-dialog experiment-dialog" id="experiment-dialog">
+        <button class="dialog-close" type="button" aria-label="Close">×</button>
+        <div class="dialog-media" id="experiment-dialog-media"></div>
+        <div class="dialog-copy">
+          <p class="section-kicker" id="experiment-dialog-label"></p>
+          <h2 id="experiment-dialog-title"></h2>
+          <p id="experiment-dialog-note"></p>
+        </div>
+      </dialog>
+
+      <dialog class="image-lightbox" id="experiment-lightbox">
+        <button class="dialog-close" type="button" aria-label="Close">×</button>
+        <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous media">‹</button>
+        <div id="experiment-lightbox-content"></div>
+        <button class="lightbox-nav lightbox-next" type="button" aria-label="Next media">›</button>
+      </dialog>
+    </main>
+    <script>
+      const experimentCards = document.querySelectorAll(".experiment-gallery-card");
+      const experimentDialog = document.querySelector("#experiment-dialog");
+      const experimentDialogMedia = document.querySelector("#experiment-dialog-media");
+      const experimentDialogLabel = document.querySelector("#experiment-dialog-label");
+      const experimentDialogTitle = document.querySelector("#experiment-dialog-title");
+      const experimentDialogNote = document.querySelector("#experiment-dialog-note");
+      const experimentDialogClose = experimentDialog.querySelector(".dialog-close");
+      const experimentLightbox = document.querySelector("#experiment-lightbox");
+      const experimentLightboxContent = document.querySelector("#experiment-lightbox-content");
+      const experimentLightboxClose = experimentLightbox.querySelector(".dialog-close");
+      const experimentLightboxPrev = experimentLightbox.querySelector(".lightbox-prev");
+      const experimentLightboxNext = experimentLightbox.querySelector(".lightbox-next");
+      let activeMediaItems = [];
+      let activeMediaIndex = 0;
+
+      const renderLightboxMedia = () => {
+        const item = activeMediaItems[activeMediaIndex];
+
+        if (!item) {
+          return;
+        }
+
+        experimentLightboxContent.innerHTML = item.type === "video"
+          ? `<video controls autoplay playsinline poster="${item.poster}" src="${item.src}"></video>`
+          : `<img src="${item.src}" alt="${item.alt}" />`;
+        experimentLightboxPrev.hidden = activeMediaItems.length < 2;
+        experimentLightboxNext.hidden = activeMediaItems.length < 2;
+      };
+
+      const moveLightbox = (direction) => {
+        activeMediaIndex =
+          (activeMediaIndex + direction + activeMediaItems.length) % activeMediaItems.length;
+        renderLightboxMedia();
+      };
+
+      experimentCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          const galleryImages = card.dataset.gallery
+            ? card.dataset.gallery.split("|")
+            : [card.dataset.image];
+          const galleryAlts = card.dataset.galleryAlts
+            ? card.dataset.galleryAlts.split("|")
+            : [card.dataset.alt];
+          const mediaItems = card.dataset.videoOnly
+            ? []
+            : galleryImages.map((image, index) => {
+                const alt = galleryAlts[index] || card.dataset.alt;
+                return {
+                  type: "image",
+                  src: image,
+                  alt,
+                };
+              });
+
+          if (card.dataset.videoSrc) {
+            mediaItems.push({
+              type: "video",
+              src: card.dataset.videoSrc,
+              poster: card.dataset.videoPoster,
+              title: card.dataset.videoTitle,
+              note: card.dataset.videoNote,
+            });
+          }
+
+          activeMediaItems = mediaItems;
+
+          const mediaMarkup = mediaItems.map((item) => {
+            if (item.type === "video") {
+              return `<button class="dialog-image-button video-thumb" type="button" data-media-type="video" data-video-src="${item.src}" data-video-poster="${item.poster}" data-video-title="${item.title}" aria-label="Play ${item.title}"><img src="${item.poster}" alt="${item.title}" /></button>`;
+            }
+
+            return `<button class="dialog-image-button" type="button" data-media-type="image"><img src="${item.src}" alt="${item.alt}" /></button>`;
+          });
+
+          experimentDialogMedia.classList.toggle("dialog-media-grid", mediaItems.length > 1);
+          experimentDialogMedia.innerHTML = mediaMarkup.join("");
+          experimentDialogLabel.textContent = card.dataset.label;
+          experimentDialogTitle.textContent = card.dataset.title;
+          experimentDialogNote.textContent = card.dataset.note;
+          experimentDialog.showModal();
+        });
+      });
+
+      experimentDialogClose.addEventListener("click", () => {
+        experimentDialog.close();
+      });
+
+      experimentDialog.addEventListener("click", (event) => {
+        if (event.target === experimentDialog) {
+          experimentDialog.close();
+        }
+      });
+
+      experimentDialogMedia.addEventListener("click", (event) => {
+        const mediaButton = event.target.closest(".dialog-image-button");
+
+        if (!mediaButton) {
+          return;
+        }
+
+        const image = mediaButton.querySelector("img");
+        const mediaSource = mediaButton.dataset.videoSrc || image.getAttribute("src");
+        activeMediaIndex = activeMediaItems.findIndex((item) => item.src === mediaSource);
+
+        if (activeMediaIndex < 0) {
+          activeMediaIndex = 0;
+        }
+
+        renderLightboxMedia();
+        experimentLightbox.showModal();
+      });
+
+      experimentLightboxPrev.addEventListener("click", () => {
+        moveLightbox(-1);
+      });
+
+      experimentLightboxNext.addEventListener("click", () => {
+        moveLightbox(1);
+      });
+
+      experimentLightboxClose.addEventListener("click", () => {
+        experimentLightboxContent.innerHTML = "";
+        experimentLightbox.close();
+      });
+
+      experimentLightbox.addEventListener("click", (event) => {
+        if (event.target === experimentLightbox) {
+          experimentLightboxContent.innerHTML = "";
+          experimentLightbox.close();
+        }
+      });
+
+      experimentLightbox.addEventListener("close", () => {
+        experimentLightboxContent.innerHTML = "";
+      });
+
+      window.addEventListener("keydown", (event) => {
+        if (!experimentLightbox.open) {
+          return;
+        }
+
+        if (event.key === "ArrowLeft") {
+          moveLightbox(-1);
+        }
+
+        if (event.key === "ArrowRight") {
+          moveLightbox(1);
+        }
+      });
+    </script>
+  </body>
+</html>
