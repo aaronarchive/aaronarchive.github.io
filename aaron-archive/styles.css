@@ -462,7 +462,8 @@ h3 {
 
 .archive-panel h2 {
   overflow-wrap: anywhere;
-  font-size: clamp(2.45rem, 5vw, 4.7rem);
+  font-size: clamp(2.2rem, 3.2vw, 3.45rem);
+  line-height: 1.04;
 }
 
 .archive-panel h2 a {
